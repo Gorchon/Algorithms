@@ -1,30 +1,114 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
 #include <sstream>
+#include <cstdlib>
+#include <algorithm>
+#include <string> 
+#include <map> 
+#include <unordered_map>
+
+
+
 using namespace std;
 
-//lee el archivo bitacora.txt y lo guarda en un vector para despues imprimir lsa primeras 10 lineas
-int main()
-{
-    string line;
-    vector<string> lines;
-    ifstream myfile("bitacora.txt");
-    if (myfile.is_open())
-    {
-        while (getline(myfile, line))//here getline reads the file line by line, the syntax is getline(file, variable) where file is the file to be read and variable is the variable where the line will be stored and line is the variable where the line will be stored. It works while the file is open and it returns false when the file is over.
-        {
-            lines.push_back(line); //here we push the line into the vector lines, we push it in a new position each time the loop runs
+
+struct combined {
+    string original;
+    int monthNum;
+    int dayNum;
+    int hourNum;
+};
+
+
+// this "||" is the or operator, so if the month number is the same, it will compare the day number, and if the day number is the same, it will compare the hour number if we use && instead of || it will only compare the month number and the day number, and if we use || instead of && it will only compare the month number and the hour number to compare the day number and the hour number we need to use && because we want to compare the day number and the hour number at the same time, if we use || it will only compare the day number and the hour number if the month number is the same, but we want to compare the day number and the hour number even if the month number is different, so we need to use && instead of ||
+// now we create a quicksort funtion that will sort the vector of structs by the month number including the day number and the hour number
+// to ensure that the hour number is included in the sorting we need to add a new variable to the struct that will hold the hour number, and we need to add a new condition to the if statement that will compare the hour number if the month number and the day number are the same, we can do it like this 
+// if (a[j].monthNum < pivot || (a[j].monthNum == pivot && a[j].dayNum <= a[r].dayNum) || (a[j].monthNum == pivot && a[j].dayNum == a[r].dayNum && a[j].hourNum <= a[r].hourNum)) {
+
+void quicksort(vector<combined>& a, int l, int r) {
+    if (l < r) {
+        int pivotMonth = a[r].monthNum;
+        int pivotDay = a[r].dayNum;
+        int pivotHour = a[r].hourNum;
+        int i = l - 1;
+        for (int j = l; j < r; j++) {
+            if (a[j].monthNum < pivotMonth || 
+                (a[j].monthNum == pivotMonth && a[j].dayNum < pivotDay) || 
+                (a[j].monthNum == pivotMonth && a[j].dayNum == pivotDay && a[j].hourNum < pivotHour)) {
+
+                i++;
+                swap(a[i], a[j]);
+            }
         }
-        myfile.close(); // when the file is over we close it. The file is over when getline returns false
+        swap(a[i + 1], a[r]);
+        int p = i + 1;
+        quicksort(a, l, p - 1);
+        quicksort(a, p + 1, r);
     }
-    else
-        cout << "Unable to open file \n";
-    for (int i = 0; i < 10; i++)
-    {
-        cout << lines[i] << '\n'; // If we dont put the '\n' the lines will be printed one after the other without spaces because the lines dont have spaces between them but the '\n' adds a new line after each line because it knows that the line is over. Basically it knows when the line is over in the vector lines because the lines are stored in the vector line by line. but we need to add the '\n' to print the lines with spaces between them because if we dont the vector will print the lines one after the other without spaces, it will print them as if they were one line.
-    }// now i want to make a new file sorting the lines by date and time
-    
-    return 0;
-}   
+}
+
+
+
+
+    int main() {
+        // we create a hash table in order to assign a number to each month and then we can compare and sort 
+        unordered_map<string, int> months_map;
+        months_map["Jan"] = 1;
+        months_map["Feb"] = 2;
+        months_map["Mar"] = 3;
+        months_map["Apr"] = 4;
+        months_map["May"] = 5;
+        months_map["Jun"] = 6;
+        months_map["Jul"] = 7;
+        months_map["Aug"] = 8;
+        months_map["Sep"] = 9;
+        months_map["Oct"] = 10;
+        months_map["Nov"] = 11;
+        months_map["Dec"] = 12;
+
+        vector<string> data;
+        ifstream inputfile("bitacora.txt"); // if we want to open a file we use ifstream, if we want to write in a file we use ofstream
+        if (!inputfile) {
+            cerr << "Error opening the file " << endl;
+            return 0;
+        }
+        string line; // we create a string called line to store the lines of the file
+        while(getline(inputfile, line)){ // we use inputfile to read the file line by line and we store the line in the string line
+            data.push_back(line);
+        }
+        inputfile.close(); // we close the file
+
+        vector<combined> sorted_data; // we create a vector of structs called data2
+
+        for (int i = 0; i < data.size(); i++){
+            string original_line = data[i];  // we create a string called original_line to store the original line of the file
+            string month, day, hour; // we create some strings to strore the month, day and hour of the line
+            stringstream SS(data[i]); // we create a stringstream called ss to store the line of the file   
+            SS >> month >> day >> hour; // we use the stringstream to store the month, day and hour of the line
+
+            int month_num = months_map[month]; // we create an int called month_num to store the number of the month
+            int day_num = atoi(day.c_str()); // we create an int called day_num to store the number of the day
+            //we want to get the numbers without the ":" so we need to use atoi to convert the string to an int and we need to use c_str() to convert the string to a char, we need to ignore the ":" because we want to compare the numbers and if we don't ignore the ":" it will compare the numbers with the ":" and it will not work
+            //no we get the numbers that we want ignoring the ":" and we store them in an int called hour_num, to do this we need to multiply the hours 60*60 times and the minutes 60 times and then we add them together
+            int hour_num = atoi(hour.substr(0, 2).c_str()) * 60 * 60 + atoi(hour.substr(3, 2).c_str()) * 60 + atoi(hour.substr(6, 2).c_str());
+            combined c; // we create a struct called c
+            c.original = original_line; // we store the original line in the struct
+            c.monthNum = month_num; // we store the number of the month in the struct
+            c.dayNum = day_num; // we store the number of the day in the struct
+            c.hourNum = hour_num; // we store the number of the hour in the struct
+
+            sorted_data.push_back(c); // we push back the struct in the vector of structs
+        }
+        quicksort(sorted_data, 0, sorted_data.size() - 1); // we call the quicksort function to sort the vector of structs
+        //we print the first 10 lines of the sorted vector of structs
+        ofstream outputfile("sorted_bitacora.txt"); // we create an ofstream called outputfile to write in the file 
+        for (int i = 0; i < sorted_data.size(); i++) {
+            outputfile << sorted_data[i].original << endl;
+        }
+        outputfile.close(); // we close it in order to save the changes
+
+        return 0;
+
+    }
