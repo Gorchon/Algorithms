@@ -11,6 +11,11 @@
 
 using namespace std;
 
+
+//Basically a struct is a simple way to group together data of different types, 
+//so we can create a struct to store the original string, the month number, the day number and the hour number
+//the main difference between a struct and a class is that in a struct all the members are public by default, 
+//and in a class all the members are private by default, and in a struct we cannot have methods, and in a class we can have methods a method is a function that is inside a class
 struct MergedInfo {
     string original;
     int monthNum;
@@ -24,36 +29,55 @@ struct MergedInfo {
 // if (a[j].monthNum < pivot || (a[j].monthNum == pivot && a[j].dayNum <= a[r].dayNum) || (a[j].monthNum == pivot && a[j].dayNum == a[r].dayNum && a[j].hourNum <= a[r].hourNum)) {
 
 void quicksort(vector<MergedInfo>& a, int l, int r) {
+    //the function takes a vector of structs. And two indices, left and right to indicate the boundaries of the subarray being sorted.
     if (l < r) {
-        int pivotMonth = a[r].monthNum;
+    //this is our base case, if the right index is greater than the left, that means that there is more than one element 
+    //in the created sub-arrays, so sorting needs to be done. If the right index is less than the left, that means that 
+    //there is only one element in the sub-array, so no sorting needs to be done.
+
+
+    //now we choose a pivot, in this cases we choose the rght-most element in the sub-array, but we can choose any element in the sub-array
+    // is our labor do this three times to get the month, day and hour. Because we are using a struct we can create a new variable in the 
+    //struct that will hold the month, day and hour, and we can do it like this. 
+        int pivotMonth = a[r].monthNum; 
         int pivotDay = a[r].dayNum;
         int pivotHour = a[r].hourNum;
-        int i = l - 1;
+        //we initialize i as one less than the left index, because we want to start comparing elements from the left index.
+        //if the left is greater that our pivot, we will increment i, and swap the element at i with the element at j.
+        int i = l - 1; // we define i as one less than the left index, so when we talk about i we are talking about the element at the left index
+//Iterate through the sub-array, from the left index to the right index.
         for (int j = l; j < r; j++) {
-            if (a[j].monthNum < pivotMonth || 
+            //now we compare each element at a[j] with the pivot, if the element is less than the pivot, we increment i, and swap the element at i with the element at j.
+            if (a[j].monthNum < pivotMonth || //if the month number is less than the pivot month number and the day number is less than the pivot day number and the hour number is less than the pivot hour number we increment i and swap the element at i with the element at j
                 (a[j].monthNum == pivotMonth && a[j].dayNum < pivotDay) || 
                 (a[j].monthNum == pivotMonth && a[j].dayNum == pivotDay && a[j].hourNum < pivotHour)) {
 
                 i++;
-                swap(a[i], a[j]);
+                swap(a[i], a[j]); // we swap the element at i with the element at j to sort the vector of structs 
             }
         }
-        swap(a[i + 1], a[r]);
+        //once we have iterated through the sub-array, we swap the element at i + 1 with the pivot, so the pivot is in the correct position.
+        swap(a[i + 1], a[r]); 
+        // now p holds the index of the pivot after partitioning.
         int p = i + 1;
+        //now we call quicksort recursively on the two new sub-arrays
         quicksort(a, l, p - 1);
         quicksort(a, p + 1, r);
     }
 }
 
+//now we create a binary search function to search for the target
 int binarySearch(const vector<MergedInfo>& a, int l, int r, int targetMonth, int targetDay) {
+    //while l is less that or equal to r, we calculate the middle index, and compare the middle element with the target.
     while (l <= r) {
-        int mid = l + (r - l) / 2; // Calculate the middle index.
+        int mid = l + (r - l) / 2; // we calculate the middle index like this to avoid overflow is 
         
         // Compare the middle element with the target.
+        //we use a[mid].monthNum to get the month number of the middle element, and we use a[mid].dayNum to get the day number of the middle element
         if (a[mid].monthNum == targetMonth && a[mid].dayNum == targetDay) {
             return mid; // Found a match.
         } else if (a[mid].monthNum < targetMonth || (a[mid].monthNum == targetMonth && a[mid].dayNum < targetDay)) {
-            // If the target is greater than the middle element, search in the right half.
+            //in this else if first we chech if the month number of the middle element is less than the target month number, or if the month number of the middle element is equal to the target month number and the day number of the middle element is less than the target day number, if any of these conditions is true, we search in the right half.
             l = mid + 1;
         } else {
             // Otherwise, search in the left half.
@@ -61,7 +85,7 @@ int binarySearch(const vector<MergedInfo>& a, int l, int r, int targetMonth, int
         }
     }
     
-    return -1; // Element not found.
+    return -1; // Element not found in our search range
 }
 
 
