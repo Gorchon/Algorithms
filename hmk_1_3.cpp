@@ -1,3 +1,4 @@
+//A01254831
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -67,6 +68,7 @@ void quicksort(vector<MergedInfo>& a, int l, int r) {
 }
 
 //now we create a binary search function to search for the target
+//we define the vector as const because we don't want to modify it, we define the left index, the right index, the target month and the target day
 int binarySearch(const vector<MergedInfo>& a, int l, int r, int targetMonth, int targetDay) {
     //while l is less that or equal to r, we calculate the middle index, and compare the middle element with the target.
     while (l <= r) {
@@ -122,6 +124,8 @@ int binarySearch(const vector<MergedInfo>& a, int l, int r, int targetMonth, int
         for (int i = 0; i < data.size(); i++){
             string original_line = data[i];  // we create a string called original_line to store the original line of the file
             string month, day, hour; // we create some strings to strore the month, day and hour of the line
+            //stringstream here works basically by taking a string and breaking it up into words, and then we can use the words to do whatever we want, in this case we want to store the month, day and hour of the line. So we receive for example 
+            //Jan  1 00:00:00 localhost sshd[378]: Server listening on and we store Jan in the string month, 1 in the string day and 00:00:00 in the string hour. 
             stringstream SS(data[i]); // we create a stringstream called ss to store the line of the file   
             SS >> month >> day >> hour; // we use the stringstream to store the month, day and hour of the line
 
@@ -142,27 +146,32 @@ int binarySearch(const vector<MergedInfo>& a, int l, int r, int targetMonth, int
         //we print the first 10 lines of the sorted vector of structs
         ofstream outputfile("sorted_bitacora.txt"); // we create an ofstream called outputfile to write in the file 
         for (int i = 0; i < sorted_data.size(); i++) {
-            outputfile << sorted_data[i].original << endl;
+            outputfile << sorted_data[i].original << endl; // we write the sorted vector of structs in the file the .original is to write the original line of the file
         }
         outputfile.close(); // we close it in order to save the changes
 
-        int targetMonth, targetDay;
-        cout << "Enter the month (1-12): ";
-        cin >> targetMonth;
-        cout << "Enter the day: ";
-        cin >> targetDay;
+       int startMonth, startDay, endMonth, endDay;
+        cout << "Enter start month (1-12): ";
+        cin >> startMonth;
+        cout << "Enter start day: ";
+        cin >> startDay;
+        cout << "Enter end month (1-12): ";
+        cin >> endMonth;
+        cout << "Enter end day: ";
+        cin >> endDay;
 
-        // Perform binary search to find the entries.
-        int resultIndex = binarySearch(sorted_data, 0, sorted_data.size() - 1, targetMonth, targetDay);
-        //to cout all the results that match the target we need to use a while loop, but with and if to check if the result is -1, if it is -1 it means that there are no results that match the target
-        if (resultIndex == -1) {
-            cout << "I cant´t find what you are searching" << endl;
-        } else {
-            while (resultIndex >= 0 && sorted_data[resultIndex].monthNum == targetMonth && sorted_data[resultIndex].dayNum == targetDay) {
-                cout << sorted_data[resultIndex].original << endl;
-                resultIndex--;
-            }
-        }
-        return 0;
+        int startIdx = binarySearch(sorted_data, 0, sorted_data.size() - 1, startMonth, startDay);
+        int endIdx = binarySearch(sorted_data, 0, sorted_data.size() - 1, endMonth, endDay);
+        if (startIdx == -1 || endIdx == -1) {
+            cout << "I can't find what you are searching for." << endl;
+            } else {    
+                ofstream outputfile("results.txt"); 
+                for (int i = startIdx; i <= endIdx; i++) {
+                    outputfile << sorted_data[i].original << endl; // Utiliza sorted_data en lugar de results.txt
+                    cout << sorted_data[i].original << endl;
+                    }
+                    outputfile.close(); // No olvides cerrar el archivo después de escribir
+}
 
-    }
+    return 0;
+}   
