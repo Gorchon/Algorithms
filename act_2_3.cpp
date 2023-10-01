@@ -7,23 +7,23 @@
 
 using namespace std;
 
-struct IpNode {
+struct IpNode {  // we define the struct in order to store the values of the list, we use a struct to store the values because we want to store the values of the list in a single variable
     string ip;
     IpNode* prev;
     IpNode* next;
 
-    IpNode(const string& ipAddress) : ip(ipAddress), prev(nullptr), next(nullptr) {}
+    IpNode(const string& ipAddress) : ip(ipAddress), prev(nullptr), next(nullptr) {} // this is a constructor of the struct Node, we do it in order to initialize the values of the struct, we pass it as reference because 
 };
 
-class IpDoublyLinkedList {
-private:
+class IpDoublyLinkedList {  
+private: // we define the private variables of the class, these two are private because we want to use them only in the class
     IpNode* head;
     IpNode* tail;
 
 public:
-    IpDoublyLinkedList() : head(nullptr), tail(nullptr) {}
+    IpDoublyLinkedList() : head(nullptr), tail(nullptr) {}   //we need this constructor to initialize the values of the class, this in order to avoid errors
 
-    void append(const string& ipAddress) {
+    void append(const string& ipAddress) { // we pass as reference the value of ipAddress because we want to store the values of the list in a single variable
         IpNode* newNode = new IpNode(ipAddress);
         if (!head) {
             head = tail = newNode;
@@ -31,6 +31,7 @@ public:
             newNode->prev = tail;
             tail->next = newNode;
             tail = newNode;
+            // and the head points 
         }
     }
 
@@ -40,18 +41,18 @@ public:
             return;
         }
 
-        bool swapped;
-        IpNode* temp;
-        do {
+        bool swapped; 
+        IpNode* temp; 
+        do { 
             swapped = false;
             IpNode* current = head;
 
-            while (current->next) {
+            while (current->next) { // while the 
                 if (current->ip > current->next->ip) {
                     temp = current->next;
-                    current->next = temp->next;
+                    current->next = temp->next;     
                     if (temp->next) {
-                        temp->next->prev = current;
+                        temp->next->prev = current; // this is to keep the order of the list for example 
                     } else {
                         tail = current;
                     }
@@ -80,15 +81,15 @@ public:
     }
 
     // function to display the first 10 elements of the list
-    void displayFirstTen() {
-        IpNode* current = head;
-        int count = 0;
-        while (current && count < 10) {
-            cout << current->ip << endl;
-            current = current->next;
-            count++;
-        }
-    }
+    // void displayFirstTen() {
+    //     IpNode* current = head;
+    //     int count = 0;
+    //     while (current && count < 10) {
+    //         cout << current->ip << endl;
+    //         current = current->next;
+    //         count++;
+    //     }
+    // }
 
     // Function to search for IPs in a specified range
     vector<string> searchRange(const string& initialIp, const string& finalIp) {
@@ -125,7 +126,7 @@ int main() {
 
     string line;
     while (getline(inputfile, line)) {
-        regex ipRegex("\\d+\\.\\d+\\.\\d+\\.\\d+");
+        regex ipRegex("\\d+\\.\\d+\\.\\d+\\.\\d+"); 
         smatch match;
         if (regex_search(line, match, ipRegex)) {
             data.push_back(match[0]);
@@ -148,10 +149,22 @@ int main() {
 
     vector<string> foundIps = ipList.searchRange(initialIp, finalIp);
 
-    cout << "IP addresses in the specified range:" << endl;
-    for (const string& ip : foundIps) {
-        cout << ip << endl;
+    // Open an output file for writing the sorted IPs
+    ofstream outputFile("sorted_ips.txt");
+    if (!outputFile) {
+        cerr << "Error al abrir el archivo de salida" << endl;
+        return 1;
     }
+
+    // Write the sorted IPs to the output file
+    for (const string& ip : foundIps) {
+        outputFile << ip << endl;
+    }
+
+    // Close the output file
+    outputFile.close();
+
+    cout << "Sorted IP addresses written to sorted_ips.txt." << endl;
 
     ipList.deleteList();
 
