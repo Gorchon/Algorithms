@@ -3,56 +3,69 @@
 #include <vector>
 #include <string>
 #include <regex>
-#include <algorithm>
+
 
 using namespace std;
 
-struct IpNode {  // we define the struct in order to store the values of the list, we use a struct to store the values because we want to store the values of the list in a single variable
+struct LogEntry {
+    string line;
     string ip;
+
+    LogEntry(const string& logLine) : line(logLine) {
+        regex ipRegex("\\b\\d+\\.\\d+\\.\\d+\\.\\d+\\b");
+        smatch match;
+        if (regex_search(logLine, match, ipRegex)) {
+            ip = match[0];
+        } else {
+            ip = "";
+        }
+    }
+};
+
+struct IpNode {
+    LogEntry logEntry;
     IpNode* prev;
     IpNode* next;
 
-    IpNode(const string& ipAddress) : ip(ipAddress), prev(nullptr), next(nullptr) {} // this is a constructor of the struct Node, we do it in order to initialize the values of the struct, we pass it as reference because 
+    IpNode(const LogEntry& entry) : logEntry(entry), prev(nullptr), next(nullptr) {}
 };
 
-class IpDoublyLinkedList {  
-private: // we define the private variables of the class, these two are private because we want to use them only in the class
+class IpDoublyLinkedList {
+private:
     IpNode* head;
     IpNode* tail;
 
 public:
-    IpDoublyLinkedList() : head(nullptr), tail(nullptr) {}   //we need this constructor to initialize the values of the class, this in order to avoid errors
+    IpDoublyLinkedList() : head(nullptr), tail(nullptr) {}
 
-    void append(const string& ipAddress) { // we pass as reference the value of ipAddress because we want to store the values of the list in a single variable
-        IpNode* newNode = new IpNode(ipAddress);
+    void append(const LogEntry& entry) {
+        IpNode* newNode = new IpNode(entry);
         if (!head) {
             head = tail = newNode;
         } else {
             newNode->prev = tail;
             tail->next = newNode;
             tail = newNode;
-            // and the head points 
         }
     }
 
     void sort() {
         if (!head || !head->next) {
-            // Empty list or list with one element, no need to sort
             return;
         }
 
-        bool swapped; 
-        IpNode* temp; 
-        do { 
+        bool swapped;
+        IpNode* temp;
+        do {
             swapped = false;
             IpNode* current = head;
 
-            while (current->next) { // while the 
-                if (current->ip > current->next->ip) {
+            while (current->next) {
+                if (current->logEntry.ip > current->next->logEntry.ip) {
                     temp = current->next;
-                    current->next = temp->next;     
+                    current->next = temp->next;
                     if (temp->next) {
-                        temp->next->prev = current; // this is to keep the order of the list for example 
+                        temp->next->prev = current;
                     } else {
                         tail = current;
                     }
@@ -72,38 +85,19 @@ public:
         } while (swapped);
     }
 
-    void display() {
-        IpNode* current = head;
-        while (current) {
-            cout << current->ip << endl;
-            current = current->next;
-        }
-    }
-
-    // function to display the first 10 elements of the list
-    // void displayFirstTen() {
-    //     IpNode* current = head;
-    //     int count = 0;
-    //     while (current && count < 10) {
-    //         cout << current->ip << endl;
-    //         current = current->next;
-    //         count++;
-    //     }
-    // }
-
-    // Function to search for IPs in a specified range
-    vector<string> searchRange(const string& initialIp, const string& finalIp) {
-        vector<string> foundIps;
+    vector<LogEntry> searchRange(const string& initialIp, const string& finalIp) {
+        vector<LogEntry> foundEntries;
         IpNode* current = head;
 
         while (current) {
-            if (current->ip >= initialIp && current->ip <= finalIp) {
-                foundIps.push_back(current->ip);
+            string ip = current->logEntry.ip;
+            if (ip >= initialIp && ip <= finalIp) {
+                foundEntries.push_back(current->logEntry);
             }
             current = current->next;
         }
 
-        return foundIps;
+        return foundEntries;
     }
 
     void deleteList() {
@@ -115,8 +109,12 @@ public:
     }
 };
 
+bool compareEntries(const LogEntry& entry1, const LogEntry& entry2) {
+    return entry1.ip < entry2.ip;
+}
+
 int main() {
-    vector<string> data;
+    vector<LogEntry> logEntries;
 
     ifstream inputfile("bitacora.txt");
     if (!inputfile) {
@@ -126,17 +124,13 @@ int main() {
 
     string line;
     while (getline(inputfile, line)) {
-        regex ipRegex("\\d+\\.\\d+\\.\\d+\\.\\d+"); 
-        smatch match;
-        if (regex_search(line, match, ipRegex)) {
-            data.push_back(match[0]);
-        }
+        logEntries.emplace_back(line);
     }
     inputfile.close();
 
     IpDoublyLinkedList ipList;
-    for (int i = 0; i < data.size(); i++) {
-        ipList.append(data[i]);
+    for (const LogEntry& entry : logEntries) {
+        ipList.append(entry);
     }
 
     ipList.sort();
@@ -147,24 +141,21 @@ int main() {
     cout << "Enter final IP: ";
     cin >> finalIp;
 
-    vector<string> foundIps = ipList.searchRange(initialIp, finalIp);
+    vector<LogEntry> foundEntries = ipList.searchRange(initialIp, finalIp);
 
-    // Open an output file for writing the sorted IPs
     ofstream outputFile("sorted_ips.txt");
     if (!outputFile) {
         cerr << "Error al abrir el archivo de salida" << endl;
         return 1;
     }
 
-    // Write the sorted IPs to the output file
-    for (const string& ip : foundIps) {
-        outputFile << ip << endl;
+    for (const LogEntry& entry : foundEntries) {
+        outputFile << entry.line << endl;
     }
 
-    // Close the output file
     outputFile.close();
 
-    cout << "Sorted IP addresses written to sorted_ips.txt." << endl;
+    cout << "Sorted log entries by IP addresses written to sorted_ips.txt." << endl;
 
     ipList.deleteList();
 
