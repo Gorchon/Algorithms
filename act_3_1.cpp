@@ -32,7 +32,33 @@ class Binary_search_tree {
             cout  << "\nThe tree has been deleted\n" << endl; 
         }; 
 
-        void DeleteBST(Node*); // this function is used to delete the tree
+        
+        void Insert(int &value) {Insert(value, Root);} //this is a definition of the function Insert, we do it in order to insert a value in the tree
+        void InOrder() {InOrder(Root);} // we pass the root to the function InOrder because we want to print the values of the tree in order
+        void PreOrder() {PreOrder(Root);} // we pass the root to the function PreOrder because we want to print the values of the tree in pre order
+        void PostOrder() {PostOrder(Root);} // we pass the root to the function PostOrder because we want to print the values of the tree in post order 
+        void breadth_first_traversal();//this function is used to print the values of the tree in breadth first traversal
 
+        void substituteToMin(Node*&, Node*&); 
+        void DeleteNode(int &value) {DeleteNode(value, Root);} // we pass the value and the root to the function DeleteNode because we want to delete the value
+        void DeleteBST(Node*&); // if we let Node*& means 
 
 };
+
+
+//now we define Insert 
+void Binary_search_tree::Insert(int &value, Node *&Root) {
+    if (Root == NULL) { // if the root is null then we create a new node and we assign the value to the data of the node
+        Root = new Node(value);
+    } else if (value < Root->data) { // if the value is less than the data of the root then we call the function Insert and we pass the value and the left of the root
+        Insert(value, Root->left);
+    } else if (value > Root->data) { // if the value is greater than the data of the root then we call the function Insert and we pass the value and the right of the root
+        Insert(value, Root->right);
+    } else { // if the value is equal to the data of the root then we print that the value is already in the tree
+        cout << "The value " << value << " is already in the tree" << endl;
+    }
+}
+ 
+int main(){
+    return 0; 
+}
