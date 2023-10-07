@@ -48,7 +48,7 @@ class Binary_search_tree {
 
 //now we define Insert 
 void Binary_search_tree::Insert(int &value, Node *&Root) {
-    if (Root == NULL) { // if the root is null then we create a new node and we assign the value to the data of the node
+    if (Root == NULL) { // if the root is null then we create a new node and we assign the value to the data of the node, null because 
         Root = new Node(value);
     } else if (value < Root->data) { // if the value is less than the data of the root then we call the function Insert and we pass the value and the left of the root
         Insert(value, Root->left);
@@ -58,6 +58,39 @@ void Binary_search_tree::Insert(int &value, Node *&Root) {
         cout << "The value " << value << " is already in the tree" << endl;
     }
 }
+
+void PreOrder(Node* Root) {
+    if (Root == NULL) { // if the root is null then we return
+        return;
+    } else {
+        cout << Root->data << " "; // we print the data of the root
+        PreOrder(Root->left); // we call the function PreOrder and we pass the left of the root
+        PreOrder(Root->right); // we call the function PreOrder and we pass the right of the root
+    }
+}
+
+void InOrder(Node* Root) {
+    if (Root == NULL) { // if the root is null then we return
+        return;
+    } else {
+        InOrder(Root->left); // we call the function InOrder and we pass the left of the root
+        cout << Root->data << " "; // we print the data of the root
+        InOrder(Root->right); // we call the function InOrder and we pass the right of the root
+    }
+}
+
+void PostOrder(Node* Root) {
+    if (Root == NULL) { // if the root is null then we return
+        return;
+    } else {
+        PostOrder(Root->left); // we call the function PostOrder and we pass the left of the root
+        PostOrder(Root->right); // we call the function PostOrder and we pass the right of the root
+        cout << Root->data << " "; // we print the data of the root
+    }
+}
+
+
+
  
 int main(){
     return 0; 
