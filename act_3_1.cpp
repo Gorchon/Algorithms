@@ -49,6 +49,8 @@ class Binary_search_tree {
         int getHeight() { return height(Root); }
          
         void ancestor(int &value); // we pass int &value because & 
+
+        int whatLevelamI(int &value); // we wanto to return -1 if the value is not in the tree, 0 if the value is in the root, 1 if the value is in the first level, 2 if the value is in the second level, etc.
         
 
 };
@@ -218,6 +220,42 @@ void Binary_search_tree::ancestor(int &value) {
     }
 }
 
+int Binary_search_tree::whatLevelamI(int &value){
+    if(Root == NULL){
+        return -1; 
+    }else{
+        queue<Node*> Q; 
+        Q.push(Root); 
+        Q.push(NULL); 
+
+        int level = 0; 
+        Node* Aux; 
+        while(!Q.empty()){
+            Aux = Q.front(); 
+            Q.pop(); 
+
+            if(Aux == NULL){
+                level++; 
+                if(!Q.empty()){
+                    Q.push(NULL); 
+                }
+            }else{
+                if(Aux->data == value){
+                    return level; 
+                }
+                if(Aux->left != NULL){
+                    Q.push(Aux->left); 
+                }
+                if(Aux->right != NULL){
+                    Q.push(Aux->right); 
+                }
+            }
+        }
+        return -1; 
+    }
+};
+
+
 int main(){
   
 
@@ -258,5 +296,14 @@ int main(){
     BST.ancestor(node);
     cout << endl;
 
-    return 0; 
+    int valueToCheck = 20; // Change this value to one that is still in the tree
+    int level = BST.whatLevelamI(valueToCheck);
+    if (level == -1) {
+        cout << valueToCheck << " not found in the tree." << endl;
+    } else {
+        cout << valueToCheck << " is at level " << level << endl;
+    }
+
+    return 0;
+
 }
