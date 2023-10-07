@@ -27,6 +27,7 @@ class Binary_search_tree {
     void PreOrder(Node*); // this function is used to print the values of the tree in pre order
     void PostOrder(Node*); // this function is used to print the values of the tree in post order
     void DeleteNode(int&, Node*&); // we pass two values one is the value of the node that we want to delete and the other is the node that we want to delete for example if we want to delete the root then we pass the value of the root and the root
+    int height(Node*);
 
     public:
         Binary_search_tree():Root(NULL){}; // constructor of the class Binary_search_tree, we do it in order to initialize the values of the class
@@ -44,7 +45,11 @@ class Binary_search_tree {
 
         void substituteToMin(Node*&, Node*&); 
         void DeleteNode(int &value) {DeleteNode(value, Root);} // we pass the value and the root to the function DeleteNode because we want to delete the value
-        void DeleteBST(Node*&); // if we let Node*& means 
+        void DeleteBST(Node*&); // if we let Node*& means
+        int getHeight() { return height(Root); }
+         
+        void ancestor(int &value); // we pass int &value because & 
+        
 
 };
 
@@ -56,7 +61,7 @@ void Binary_search_tree::Insert(int &value, Node *&Root) {
     } else if (value < Root->data) { // if the value is less than the data of the root then we call the function Insert and we pass the value and the left of the root
         Insert(value, Root->left);
     } else if (value > Root->data) { // if the value is greater than the data of the root then we call the function Insert and we pass the value and the right of the root
-        Insert(value, Root->right);
+        Insert(value, Root->right);     
     } else { // if the value is equal to the data of the root then we print that the value is already in the tree
         cout << "The value " << value << " is already in the tree" << endl;
     }
@@ -167,8 +172,51 @@ void Binary_search_tree::DeleteBST(Node*& Root) {
   
 }
 
+int Binary_search_tree::height(Node* Root){
+    if(Root == NULL){
+        return 0; 
+    }else{
+        int left_height = height(Root->left); 
+        int right_height = height(Root->right); 
 
+        if(left_height > right_height){
+            return left_height + 1; 
+        }else{
+            return right_height + 1; 
+        }
+    }
+}
 
+void Binary_search_tree::ancestor(int &value) {
+    if (Root == NULL) {
+        return;
+    } else {
+        stack<Node*> S;
+        Node* Aux = Root;
+        while (Aux != NULL) {
+            S.push(Aux);
+            if (value < Aux->data) {
+                Aux = Aux->left;
+            } else {
+                Aux = Aux->right;
+            }
+        }
+
+        bool found = false;
+        cout << "Ancestors of " << value << ": ";
+        while (!S.empty()) {
+            Aux = S.top();
+            if (Aux->data == value) {
+                found = true;
+            }
+            if (found) {
+                cout << Aux->data << " ";
+            }
+            S.pop();
+        }
+        cout << endl;
+    }
+}
 
 int main(){
   
@@ -202,6 +250,13 @@ int main(){
     node = 13; 
     BST.DeleteNode(node);
     BST.breadth_first_traversal();
+    cout << endl;
+
+    cout << "Height of the tree: " << BST.getHeight() << endl;
+
+    node = 20;
+    BST.ancestor(node);
+    cout << endl;
 
     return 0; 
 }
