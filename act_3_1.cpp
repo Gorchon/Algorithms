@@ -22,7 +22,7 @@ class Binary_search_tree {
     Node *Root; 
 
     //Functions 
-    void Insert(int&, Node*&); // Node*& means that we are passing the pointer by reference, this means that we are passing the address of the pointer and not the value of the pointer
+    void Insert(int&, Node*&); 
     void InOrder(Node*); // this function is used to print the values of the tree in order
     void PreOrder(Node*); // this function is used to print the values of the tree in pre order
     void PostOrder(Node*); // this function is used to print the values of the tree in post order
@@ -100,33 +100,39 @@ void Binary_search_tree::PostOrder(Node* Root) {
 }
 
 void Binary_search_tree::breadth_first_traversal() {
-    if (Root == NULL) { // if the root is null then we return
-        return;
+    if (Root == NULL) {
+        return; // If the tree is empty (root is null), return.
     } 
-    queue<Node*> Q; // we create a queue of nodes
-    Q.push(Root); 
 
-    Node *Aux; 
+    queue<Node*> Q; // Create a queue of nodes to perform level order traversal.
+    Q.push(Root);  // Push the root node's address to the queue.
+
+    Node *Aux;  // Create a temporary node pointer.
+
     while(!Q.empty()){
-        Q.push(NULL); 
-
-        Aux = Q.front();
+        Q.push(NULL); // Push NULL to the queue to mark the end of the current level.
+        
+        Aux = Q.front(); // Get the address of the node at the front of the queue.
         while(Aux != NULL){
-            cout << Aux->data << " ";
+            cout << Aux->data << " "; // Print the data of the node.
 
-            if(Aux->left != NULL){
-                Q.push(Aux->left); 
+            if(Aux -> left != NULL){
+                Q.push(Aux -> left); // Push the address of the left child to the queue.
             }
             if(Aux->right != NULL){
-                Q.push(Aux->right); 
+                Q.push(Aux->right); // Push the address of the right child to the queue.
             }
-            Q.pop();
-            Aux = Q.front();
+
+            Q.pop(); // Pop the address of the current node from the queue.
+            Aux = Q.front(); // Get the address of the node at the front of the queue.
+
         }
         Q.pop();
         cout << endl;
     }
-}
+    }
+
+
 
 void Binary_search_tree::substituteToMin(Node*& aptAux, Node*& aptNode) { //apt means pointer to a node
     if (aptAux->left != NULL) { // if the left of the node is not null then we call the function substituteToMin and we pass the left of the node and the node
@@ -201,14 +207,15 @@ void Binary_search_tree::ancestor(int &value) {
                 Aux = Aux->left;
             } else {
                 Aux = Aux->right;
-            }
+            } 
+            //and once we find the value we stop the loop, the loop is stops because the Aus turns null when we find the value
         }
 
         bool found = false;
         cout << "Ancestors of " << value << ": ";
         while (!S.empty()) {
-            Aux = S.top();
-            if (Aux->data == value) {
+            Aux = S.top(); // top returns the value of the top of the stack 
+            if (Aux->data == value) { 
                 found = true;
             }
             if (found) {
@@ -257,16 +264,11 @@ int Binary_search_tree::whatLevelamI(int &value){
 
 
 int main(){
-  
-
     Binary_search_tree BST; // we create a binary search tree
-
-    vector<int> Vector = {47, 60, 22, 12, 6, 13, 41, 20, 52, 16}; 
-
+    vector<int> Vector = {10}; 
     for(int i : Vector){
         BST.Insert(i);
     }
-
     cout << "In order: ";
     BST.InOrder();
     cout << endl;
@@ -279,24 +281,15 @@ int main(){
     cout << "Breadth first traversal: " << endl;
     BST.breadth_first_traversal();
     cout << endl;
-
-    int node = 16;
+    int node = 4;
     BST.DeleteNode(node);
     BST.breadth_first_traversal();
     cout << endl;
-
-    node = 13; 
-    BST.DeleteNode(node);
-    BST.breadth_first_traversal();
-    cout << endl;
-
     cout << "Height of the tree: " << BST.getHeight() << endl;
-
-    node = 20;
+    node = 6;
     BST.ancestor(node);
     cout << endl;
-
-    int valueToCheck = 20; // Change this value to one that is still in the tree
+    int valueToCheck = 9; // Change this value to one that is still in the tree
     int level = BST.whatLevelamI(valueToCheck);
     if (level == -1) {
         cout << valueToCheck << " not found in the tree." << endl;
