@@ -16,6 +16,7 @@ struct PortNode {
     int port;
     int count;
     vector<string> ips;
+    vector<string> lines; // Add a vector to store entire lines
     PortNode* left;
     PortNode* right;
 
@@ -25,7 +26,12 @@ struct PortNode {
         ips.push_back(ip);
         count++;
     }
+
+    void insertLine(const string& line) { // Function to insert entire lines
+        lines.push_back(line);
+    }
 };
+
 
 class Binary_search_tree {
 private:
@@ -48,8 +54,8 @@ public:
         cout << "\nDestructor: BST deleted\n" << endl;
     }
 
-    void Insert(int port) {
-        Insert(port, Root);
+    void Insert(int port) { 
+        Insert(port, Root); //here we call the insert function to insert the port number into the BST, these two functions are in the private section
     }
     int getHeight() {
         return height(Root);
@@ -61,7 +67,6 @@ public:
     // Other member functions
 };
 
-// Function to read and parse the "bitacora.txt" file
 void Binary_search_tree::ReadBitacoraFile(const string& filename) {
     ifstream bitacoraFile(filename);
     if (!bitacoraFile.is_open()) {
@@ -70,21 +75,19 @@ void Binary_search_tree::ReadBitacoraFile(const string& filename) {
     }
 
     string line;
-    regex portPattern(R"(\b(\d{4})\b)");  // Updated regular expression for 4-digit port numbers
+    regex portPattern(R"(\b(\d{4})\b)");
 
     while (getline(bitacoraFile, line)) {
         smatch match;
         if (regex_search(line, match, portPattern)) {
-            int port = stoi(match[1]);  // Use the first capture group
-            Insert(port);  // Insert port number into the BST
+            int port = stoi(match[1]);
+            Insert(port);
 
-            // Extract and insert IP addresses into the appropriate node
             size_t pos = line.find(":");
             if (pos != string::npos) {
                 string ipAddress = line.substr(pos + 1);
-                PortNode* node = Root;  // Start from the root
+                PortNode* node = Root;
 
-                // Find the node with the corresponding port number
                 while (node->port != port) {
                     if (port < node->port) {
                         if (node->left == nullptr) {
@@ -99,8 +102,8 @@ void Binary_search_tree::ReadBitacoraFile(const string& filename) {
                     }
                 }
 
-                // Insert the IP address into the node
                 node->insertIP(ipAddress);
+                node->insertLine(line); // Insert the entire line
             }
         }
     }
@@ -108,12 +111,11 @@ void Binary_search_tree::ReadBitacoraFile(const string& filename) {
     bitacoraFile.close();
 }
 
+
 // Function to display the top ports and their counts to an output file
 void Binary_search_tree::DisplayTopPorts(const string& outputFile, int topCount) {
-    // Use a map to store the ports and their total access counts
     map<int, PortNode*> portNodes;
 
-    // Helper function to traverse the BST and store port nodes
     function<void(PortNode*)> traverse = [&](PortNode* node) {
         if (node) {
             portNodes[node->port] = node;
@@ -124,16 +126,13 @@ void Binary_search_tree::DisplayTopPorts(const string& outputFile, int topCount)
 
     traverse(Root);
 
-    // Create a vector of pairs (port, count) for sorting
     vector<pair<int, PortNode*>> sortedPorts(portNodes.begin(), portNodes.end());
 
-    // Sort the ports in descending order of count
     sort(sortedPorts.begin(), sortedPorts.end(),
          [](const pair<int, PortNode*>& a, const pair<int, PortNode*>& b) {
              return a.second->count > b.second->count;
          });
 
-    // Write the top ports and their counts to the output file
     ofstream output(outputFile);
     if (output.is_open()) {
         for (int i = 0; i < topCount && i < sortedPorts.size(); i++) {
@@ -142,9 +141,10 @@ void Binary_search_tree::DisplayTopPorts(const string& outputFile, int topCount)
 
             output << "Port: " << port << " Counter: " << portNode->count << " times\n";
 
-            // Write IP addresses for the top port
-            for (const string& ip : portNode->ips) { 
-                output << "   IP: " << ip << "\n"; //here we display the IP 
+            // Write entire lines and IP addresses for the top port
+            for (size_t j = 0; j < portNode->lines.size(); j++) {
+                output << "IP --> " << portNode->lines[j] << "\n";
+               // output << "   IP: " << portNode->ips[j] << "\n";
             }
 
             output << "\n";
@@ -155,6 +155,7 @@ void Binary_search_tree::DisplayTopPorts(const string& outputFile, int topCount)
         cout << "Error: Unable to create output file." << endl;
     }
 }
+
 
 // Function to insert a port into the BST
 void Binary_search_tree::Insert(int port, PortNode*& node) {
@@ -189,3 +190,4 @@ int main() {
 
     return 0;
 }
+
