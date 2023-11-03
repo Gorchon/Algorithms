@@ -25,16 +25,17 @@ struct node {
 class Graph{
     private: 
                 int numVertices;
-                list<int> *adjLists;
+                list<int> *adjList;
+                int **adjMatrix;
                 bool *visited;                  //these three are the attributes of the class 
             public:
                 Graph(int vertices){ // constructor
                     numVertices = vertices;
-                    adjLists = new list<int>[vertices];
+                    adjList = new list<int>[vertices];
                     visited = new bool[vertices]; 
                 }
                 ~Graph(){ // destructor-
-                    delete[] adjLists;
+                    delete[] adjList;
                 }
                 void addEdge(int, int);
                 void addEdgeDirected(int, int);
@@ -55,7 +56,7 @@ void Graph::BFS(int startVertex) {
         cout << "Visited: " << currVertex << " ";
         queue.pop_front();
 
-        for (auto i : adjLists[currVertex]) {
+        for (auto i : adjList[currVertex]) {
             if (!visited[i]) {
                 visited[i] = true;
                 queue.push_back(i);
@@ -68,7 +69,7 @@ void Graph::BFS(int startVertex) {
 
 void Graph::DFS(int vertex){
     this->visited[vertex] = true;  // we mark the vertex as visited
-    list<int> adjVertex = this -> adjLists[vertex]; // we create a list of the adjacent vertices of the vertex that we are currently in this -> adjLists[vertex] this means that we are accessing the list of the vertex that we are currently in
+    list<int> adjVertex = this -> adjList[vertex]; // we create a list of the adjacent vertices of the vertex that we are currently in this -> adjList[vertex] this means that we are accessing the list of the vertex that we are currently in
 
     cout << vertex << " "; // we print the vertex that we are currently in 
     for(auto i: adjVertex){ //we iterate through the list of adjacent vertices 
@@ -88,7 +89,7 @@ void Graph::ResetVisited(){
 void Graph::printGraph(){
     for(int i = 0; i < numVertices; i++){
         cout << i ;
-        for(auto node: adjLists[i]){
+        for(auto node: adjList[i]){
             cout <<  " -> " << node ;
             }
             cout << endl;
@@ -96,12 +97,12 @@ void Graph::printGraph(){
 }
      
 void Graph::addEdge(int src, int dest){
-    adjLists[src].push_back(dest);  //so basically what we are doing is pushing to the back or it could be the front of the lis too the vertex that we want to add to the list 
-    adjLists[dest].push_back(src);
+    adjList[src].push_back(dest);  //so basically what we are doing is pushing to the back or it could be the front of the lis too the vertex that we want to add to the list 
+    adjList[dest].push_back(src);
 }
 
 void Graph::addEdgeDirected(int src, int dest){
-    adjLists[src].push_back(dest);
+    adjList[src].push_back(dest);
 }
 
 
