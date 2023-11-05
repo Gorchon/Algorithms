@@ -16,9 +16,9 @@ private:
     list<int>* adjList;
 
 public:
-    Graph(int vertices);
+    Graph(int vertices, int edges);
     ~Graph();
-    void AddEdge(int src, int dest);
+
     void LoadGraph();
     void PrintMatrix();
     void PrintList();
@@ -28,69 +28,43 @@ public:
     void BFSList(int startVertex);
 };
 
-
-Graph::Graph(int vertices) {
+Graph::Graph(int vertices, int edges) {
     numVertices = vertices;
-    numEdges = 0;
+    numEdges = edges;
 
-    // Initialize the adjacency matrix
     adjMatrix = new int*[vertices];
-    for (int i = 0; i < vertices; i++) {
+    for (int i = 0; i < vertices; i++) { 
         adjMatrix[i] = new int[vertices];
         for (int j = 0; j < vertices; j++) {
             adjMatrix[i][j] = 0;
         }
     }
 
-    // Initialize the adjacency list
-    adjList = new list<int>[vertices];
-}
+    adjList = new list<int>[vertices]; 
+} 
 
-// Destructor
 Graph::~Graph() {
     delete[] adjMatrix;
     delete[] adjList;
 }
 
-// Method to add an edge between two vertices
-void Graph::AddEdge(int src, int dest) {
-    if (src != dest && adjMatrix[src][dest] == 0) {
-        adjMatrix[src][dest] = 1;
-        adjMatrix[dest][src] = 1;
+void Graph::LoadGraph() { //this is the method that loads the graph with random edges and vertices.
+    srand(time(nullptr)); //srand is used to generate random numbers, works with time(nullptr) to generate a random number every time the program is run.
 
-        adjList[src].push_back(dest);
-        adjList[dest].push_back(src);
-        numEdges++;
-    }
-}
-
-// Method to load a graph with a minimum spanning tree
-void Graph::LoadGraph() {
-    srand(time(nullptr));
-
-    // Generate a minimum spanning tree
-    vector<bool> inMST(numVertices, false);
-    vector<int> parent(numVertices, -1);
-
-    inMST[0] = true;  // Start with the first vertex
-
-    while (numEdges < numVertices - 1) {
-        int src = rand() % numVertices;
+    for (int i = 0; i < numEdges; i++) { //we use a for loop to generate the edges and vertices for the graph. 
+        int src = rand() % numVertices; //we use rand() % numVertices to generate a random number between 0 and the number of vertices. 
         int dest = rand() % numVertices;
 
-        if (inMST[src] && !inMST[dest]) {
-            AddEdge(src, dest);
-            inMST[dest] = true;
-            parent[dest] = src;
-        } else if (inMST[dest] && !inMST[src]) {
-            AddEdge(dest, src);
-            inMST[src] = true;
-            parent[src] = dest;
+        if (src != dest && adjMatrix[src][dest] == 0) { //this if statement is used to make sure that the source and destination are not the same and that the edge does not already exist.
+            adjMatrix[src][dest] = 1;  //we use adjMatrix[src][dest] = 1 to create the edge between the source and destination.
+            adjMatrix[dest][src] = 1; // we need to do it twice because the graph is undirected. 
+
+            adjList[src].push_back(dest); // in this we push the destination into the source's list. 
+            adjList[dest].push_back(src);
         }
     }
 }
 
-// Method to print the adjacency matrix
 void Graph::PrintMatrix() {
     for (int i = 0; i < numVertices; i++) {
         for (int j = 0; j < numVertices; j++) {
@@ -100,7 +74,6 @@ void Graph::PrintMatrix() {
     }
 }
 
-// Method to print the adjacency list
 void Graph::PrintList() {
     for (int i = 0; i < numVertices; i++) {
         cout << i << " -> ";
@@ -111,10 +84,9 @@ void Graph::PrintList() {
     }
 }
 
-// Method for depth-first search on the adjacency matrix
 void Graph::DFSMatrix(int startVertex) {
-    vector<bool> visited(numVertices, false);
-    stack<int> s;
+    vector<bool> visited(numVertices, false); //we use a vector to keep track of the visited vertices. 
+    stack<int> s; 
 
     s.push(startVertex);
 
@@ -136,7 +108,6 @@ void Graph::DFSMatrix(int startVertex) {
     cout << endl;
 }
 
-// Method for breadth-first search on the adjacency matrix
 void Graph::BFSMatrix(int startVertex) {
     vector<bool> visited(numVertices, false);
     queue<int> q;
@@ -161,7 +132,6 @@ void Graph::BFSMatrix(int startVertex) {
     cout << endl;
 }
 
-// Method for depth-first search on the adjacency list
 void Graph::DFSList(int startVertex) {
     vector<bool> visited(numVertices, false);
     stack<int> s;
@@ -186,7 +156,6 @@ void Graph::DFSList(int startVertex) {
     cout << endl;
 }
 
-// Method for breadth-first search on the adjacency list
 void Graph::BFSList(int startVertex) {
     vector<bool> visited(numVertices, false);
     queue<int> q;
@@ -212,11 +181,13 @@ void Graph::BFSList(int startVertex) {
 }
 
 int main() {
-    int n, initialNode;
+    int n, m, initialNode;
     cout << "Enter the number of vertices (n): ";
     cin >> n;
+    cout << "Enter the number of edges (m): ";
+    cin >> m;
 
-    Graph g(n);
+    Graph g(n, m);
 
     g.LoadGraph();
 
@@ -243,4 +214,3 @@ int main() {
 
     return 0;
 }
-
