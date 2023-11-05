@@ -1,132 +1,154 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <list>
 #include <queue>
 #include <stack>
-#include <set>
-#include <map>
-#include <list>
-#include <string>
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
-
-struct node {
-    int vertex; 
-    struct node* next; // this is the pointer to the next node in the list
-};
-
-// struct node* createNode(int v){ // this is the function that creates a new node to be added to the list
-//     struct node* newNode = new node; 
-//     newNode->vertex = v;
-//     newNode->next = NULL;
-//     return newNode;
-// }
-class Graph{
-    private: 
+class Graph {
+private: //these things are defined in private because they are not supposed to be accessed by the user 
     int numVertices;
-    list<int> *adjList;
-    int **adjMatrix;
-    bool *visited;                  //these three are the attributes of the class 
-    public:
-    Graph(int vertices) {
-        numVertices = vertices;
-        adjList = new list<int>[vertices];
-        adjMatrix = new int*[vertices];
-        visited = new bool[vertices];
+    int numEdges;
+    int** adjMatrix;
+    list<int>* adjList; 
 
-        for (int i = 0; i < vertices; i++) {
+public:
+    Graph(int vertices, int edges) { 
+        numVertices = vertices; 
+        numEdges = edges; 
+
+        // Initialize the adjacency matrix
+        adjMatrix = new int*[vertices];
+        for (int i = 0; i < vertices; i++) { 
             adjMatrix[i] = new int[vertices];
             for (int j = 0; j < vertices; j++) {
-                adjMatrix[i][j] = 0; // Initialize the adjacency matrix with all zeros
-                }
+                adjMatrix[i][j] = 0;
             }
         }
 
-                ~Graph(){ // destructor-
-                    delete[] adjList;
-                    delete[] adjMatrix;
-                    delete[] visited;
-                }
-                void addEdge(int, int);
-                void addEdgeDirected(int, int);
-                void printGraph();
-                void ResetVisited();
-                void DFS(int);
-                void BFS(int);
-        };
+        // Initialize the adjacency list
+        adjList = new list<int>[vertices];
+    }
 
+    ~Graph() {
+        delete[] adjMatrix;
+        delete[] adjList;
+    }
 
-void Graph::BFS(int startVertex) {
-    visited[startVertex] = true;
-    list<int> queue;
-    queue.push_back(startVertex);
+    void LoadGraph() {
+        srand(time(nullptr));
 
-    while (!queue.empty()) {
-        int currVertex = queue.front();
-        cout << "Visited: " << currVertex << " ";
-        queue.pop_front();
+        // Randomly fill the graph with m connections
+        for (int i = 0; i < numEdges; i++) {
+            int src = rand() % numVertices;
+            int dest = rand() % numVertices;
 
-        for (auto i : adjList[currVertex]) {
-            if (!visited[i]) {
-                visited[i] = true;
-                queue.push_back(i);
+            if (src != dest && adjMatrix[src][dest] == 0) {
+                adjMatrix[src][dest] = 1;
+                adjMatrix[dest][src] = 1;
+
+                adjList[src].push_back(dest);
+                adjList[dest].push_back(src);
             }
         }
     }
-}
 
-
-
-void Graph::DFS(int vertex){
-    this->visited[vertex] = true;  // we mark the vertex as visited
-    list<int> adjVertex = this -> adjList[vertex]; // we create a list of the adjacent vertices of the vertex that we are currently in this -> adjList[vertex] this means that we are accessing the list of the vertex that we are currently in
-
-    cout << vertex << " "; // we print the vertex that we are currently in 
-    for(auto i: adjVertex){ //we iterate through the list of adjacent vertices 
-        if(!this->visited[i]){ // if the vertex has not been visited we call the function again with the vertex that we are currently in
-            DFS(i);  // this is the recursive call 
+    void PrintMatrix() { 
+        for (int i = 0; i < numVertices; i++) {
+            for (int j = 0; j < numVertices; j++) {
+                cout << adjMatrix[i][j] << " ";
+            }
+            cout << endl; 
         }
     }
-}
 
-
-void Graph::ResetVisited(){
-    for(int i = 0; i < numVertices; i++){
-        visited[i] = false;
-    }
-}
-
-void Graph::printGraph(){
-    for(int i = 0; i < numVertices; i++){
-        cout << i ;
-        for(auto node: adjList[i]){
-            cout <<  " -> " << node ;
+    void PrintList() {
+        for (int i = 0; i < numVertices; i++) {
+            cout << i << " -> ";
+            for (auto neighbor : adjList[i]) {
+                cout << neighbor << " ";
             }
             cout << endl;
+        }
+    }
+
+    void DFS(int startVertex) {  
+        vector<bool> visited(numVertices, false);
+        stack<int> s;
+
+        s.push(startVertex);
+
+        while (!s.empty()) {
+            int currVertex = s.top();
+            s.pop();
+
+            if (!visited[currVertex]) {
+                visited[currVertex] = true;
+                cout << currVertex << " ";
+
+                for (auto i : adjList[currVertex]) {
+                    if (!visited[i]) {
+                        s.push(i);
+                    }
+                }
             }
-}
-     
-void Graph::addEdge(int src, int dest){
-    adjList[src].push_back(dest);  //so basically what we are doing is pushing to the back or it could be the front of the lis too the vertex that we want to add to the list 
-    adjList[dest].push_back(src);
-}
+        }
+        cout << endl;
+    }
 
-void Graph::addEdgeDirected(int src, int dest){
-    adjList[src].push_back(dest);
-}
+    void BFS(int startVertex) {
+        vector<bool> visited(numVertices, false);
+        queue<int> q;
 
+        q.push(startVertex);
 
-int main(){
-    Graph g(5); // we create a graph with 5 vertices
-    g.addEdge(0,1);
-    g.addEdge(0,2);
-    g.addEdge(0,3);
-    g.addEdge(1,2);
-    g.addEdge(2,4);
-    g.printGraph();
+        while (!q.empty()) {
+            int currVertex = q.front();
+            q.pop();
 
-    cout << " \nBFS: " << endl; 
-    g.BFS(0);
+            if (!visited[currVertex]) {
+                visited[currVertex] = true;
+                cout << currVertex << " ";
+
+                for (auto i : adjList[currVertex]) {
+                    if (!visited[i]) {
+                        q.push(i);
+                    }
+                }
+            }
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    int n, m, initialNode;
+    cout << "Enter the number of vertices (n): ";
+    cin >> n;
+    cout << "Enter the number of edges (m): ";
+    cin >> m;
+
+    Graph g(n, m);
+
+    g.LoadGraph();
+
+    cout << "Enter the initial node for DFS and BFS: ";
+    cin >> initialNode;
+
+    cout << "\nAdjacency Matrix:" << endl;
+    g.PrintMatrix();
+
+    cout << "\nAdjacency List:" << endl;
+    g.PrintList();
+
+    cout << "\nDFS Path:" << endl;
+    g.DFS(initialNode);
+
+    cout << "\nBFS Path:" << endl;
+    g.BFS(initialNode);
+
     return 0;
 }
