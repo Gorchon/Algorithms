@@ -40,7 +40,7 @@ Graph::Graph(int vertices, int edges) {
         }
     }
 
-    adjList = new list<int>[vertices]; 
+    adjList = new list<int>[vertices];    //this is the adjacency list. and represents a list of vertices adjacent to a particular vertex. 
 } 
 
 Graph::~Graph() {
