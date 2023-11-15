@@ -15,10 +15,23 @@ void execute_command(char *args[]) {
 
     if (pid == 0) {
         // Child process
-        if (execvp(args[0], args) == -1) {
-            perror("shell");
+        if (strcmp(args[0], "ls") == 0) {
+            execlp("ls", "ls", NULL);
+        } else if (strcmp(args[0], "pwd") == 0) {
+            execlp("pwd", "pwd", NULL);
+        } else if (strcmp(args[0], "date") == 0) {
+            execlp("date", "date", NULL);
+        } else if (strcmp(args[0], "echo") == 0) {
+            execlp("echo", "echo", args[1], NULL);
+        } else if (strcmp(args[0], "mkdir") == 0) {
+            execlp("mkdir", "mkdir", args[1], NULL);
+        } else if (strcmp(args[0], "rm") == 0) {
+            execlp("rm", "rm", args[1], NULL);
+        } else {
+            // Comando no reconocido
+            fprintf(stderr, "shell: comando no reconocido\n");
+            exit(EXIT_FAILURE);
         }
-        exit(EXIT_FAILURE);
     } else if (pid < 0) {
         perror("shell");
     } else {
