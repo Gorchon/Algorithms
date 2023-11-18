@@ -23,7 +23,7 @@ private:
 public:
     Graph(int numVertices) {
         initGraph(numVertices);
-    }   
+    }
 
     void loadGraph(int source, int destination) {
         adjList[source].push_back(destination);
@@ -40,8 +40,8 @@ public:
             }
         }
     }
-    
-    void loadData(){
+
+    void loadData() {
         ifstream inputFile("bitacora.txt");
         if (!inputFile) {
             cerr << "Error opening the file " << endl;
@@ -65,7 +65,6 @@ public:
             if (colonPos != std::string::npos) {
                 // Extract the substring before ':' (excluding ':')
                 string newString = sc.substr(0, colonPos);
-                //cout << "Read: " << newString << endl;
 
                 // Split the newString by dots
                 stringstream splitSS(newString);
@@ -78,9 +77,9 @@ public:
                     uniqueElements.insert(num3);
                     uniqueElements.insert(num4);
 
-                    loadGraph(num1,num2);
-                    loadGraph(num2,num3);
-                    loadGraph(num3,num4);
+                    loadGraph(num1, num2);
+                    loadGraph(num2, num3);
+                    loadGraph(num3, num4);
 
                 } else {
                     std::cout << "Invalid IP format" << std::endl;
@@ -91,62 +90,60 @@ public:
         }
     }
 
-    void printOutDegrees() {
-        for (int i = 0; i < numVertices; i++) {
-            int outDegree = adjList[i].size();
-            cout << "Out-degree of Vertex " << i << ": " << outDegree << "\n";
-            highestOutDegree(outDegree);
+    void printOutDegreesToFile(const std::string& filename) {
+        // Open the output file
+        std::ofstream outputFile(filename);
+
+        if (!outputFile) {
+            cerr << "Error opening the output file " << filename << endl;
+            return;
         }
 
-        cout << "Highest Out-degree: " << currentHighest << "\n";
-}
+        for (int i = 0; i < numVertices; i++) {
+            int outDegree = adjList[i].size();
+            outputFile << "Out-degree of Vertex " << i << ": " << outDegree << "\n";
+        }
 
-    void printTop10(){
+        cout << "Out-degrees written to file: " << filename << "\n";
+        outputFile.close(); // Close the output file
+    }
+
+    void printTop10() {
+        vector<pair<int, int>> outDegreeVector; // Vector of all the out degree values (it is a pair to keep track of the index)
+
         for (int i = 0; i < numVertices; i++) {
             int outDegree = adjList[i].size();
 
-            outDegreeVector.push_back(make_pair(adjList[i].size(), i)); //Pushes all the number of out degrees in the vector
+            outDegreeVector.push_back(make_pair(adjList[i].size(), i)); // Pushes all the number of out degrees in the vector
         }
 
-            // Sort the outDegreeVector by out-degrees in descending order
-            std::sort(outDegreeVector.begin(), outDegreeVector.end(), std::greater<>()); //Sorts by amount in 
- 
-            // Displaying the highest 10 values
-            for (int i = 9; i >= 0; i--){
-                cout << "Number " << i + 1 << " has: " << outDegreeVector[i].first << " outgoing nodes. This is node: " << outDegreeVector[i].second << endl;
-            }
+        // Sort the outDegreeVector by out-degrees in descending order
+        std::sort(outDegreeVector.begin(), outDegreeVector.end(), std::greater<>()); // Sorts by amount in
+
+        // Displaying the highest 10 values
+        for (int i = 9; i >= 0; i--) {
+            cout << "Number " << i + 1 << " has: " << outDegreeVector[i].first << " outgoing nodes. This is node: " << outDegreeVector[i].second << endl;
+        }
     };
 
 private:
     int newHighest = 0;
     int currentHighest = 0;
-     vector<pair<int, int>> outDegreeVector; //Vector of all the out degree values (it is a pair to keep track of the index)
-
-    int highestOutDegree(int numDegrees){
-            int newHighest = numDegrees;
-
-            if (newHighest >= currentHighest){
-                currentHighest = newHighest;
-            }
-
-            return newHighest;
-        }
-
 };
 
 int main() {
     Graph g(1000); // Create a Graph instance with an initial number of vertices (0)
 
-    //Load the data from the file
+    // Load the data from the file
     g.loadData();
 
-    //Prints all out degree values
-    g.printOutDegrees();
+    // Print out-degrees to a file named "outdegrees.txt"
+    g.printOutDegreesToFile("outdegrees.txt");
 
     // Print the top 10 outdegree values
     g.printTop10();
 
-    //Boot master is probably located on IP address segment 60
+    // Boot master is probably located on IP address segment 60
 
     return 0;
 }
