@@ -51,9 +51,13 @@ void simulateExecution(Process *processes[], int num_processes) {
         for (int i = 0; i < num_processes; i++) {
             if (pcbs[i]->remaining_time > 0) {
                 printf("Ejecutando proceso %d\n", pcbs[i]->process->pid);
-                pcbs[i]->remaining_time -= time_quantum;
-                total_remaining_time -= time_quantum;
+                
+                // Reducir el tiempo restante al mínimo entre el tiempo cuántico y el tiempo restante
+                int tiempo_ejecucion = (pcbs[i]->remaining_time < time_quantum) ? pcbs[i]->remaining_time : time_quantum;
 
+                pcbs[i]->remaining_time -= tiempo_ejecucion;
+                total_remaining_time -= tiempo_ejecucion;
+                
                 if (pcbs[i]->remaining_time <= 0) {
                     printf("Proceso %d completado\n", pcbs[i]->process->pid);
                 }
