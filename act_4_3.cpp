@@ -30,13 +30,15 @@ public:
 
     void printTop10();
 
-private:
-    int newHighest = 0;
+    vector<string> BootMaster(const std::string& outputFilename);  // Updated function signature
+
+public:
+    int newHighest = 0;  // Made public for access in main
     int currentHighest = 0;
 };
 
-// Function implementations
-void Graph::initGraph(int vertices) {
+// Function implementations...
+void Graph::initGraph(int vertices) { // here we are initializing the graph
     numVertices = vertices;
     adjList.resize(numVertices);
 }
@@ -46,10 +48,10 @@ Graph::Graph(int numVertices) {
 }
 
 void Graph::loadGraph(int source, int destination) {
-    adjList[source].push_back(destination);
+    adjList[source].push_back(destination); // here we are loading the graph with the source and destination
 }
 
-void Graph::printList() {
+void Graph::printList() {  // this function prints the list of the graph
     for (int i = 0; i < numVertices; i++) {
         if (!adjList[i].empty()) {
             cout << "Vertex " << i << ":";
@@ -67,14 +69,11 @@ void Graph::loadData() {
         cerr << "Error opening the file " << endl;
     }
 
-    std::set<int> uniqueElements; // To keep track of unique elements (nodes)
+    std::set<int> uniqueElements;
 
-    // Declare integer variables to store the individual IP numbers
     int num1, num2, num3, num4;
 
-    // Read and process each line in the file
     string entry;
-
     while (std::getline(inputFile, entry)) {
         stringstream SS(entry);
         string sa, ch, sb, sc;
@@ -83,15 +82,12 @@ void Graph::loadData() {
         size_t colonPos = sc.find(':');
 
         if (colonPos != std::string::npos) {
-            // Extract the substring before ':' (excluding ':')
             string newString = sc.substr(0, colonPos);
 
-            // Split the newString by dots
             stringstream splitSS(newString);
             char dot;
 
             if (splitSS >> num1 >> dot >> num2 >> dot >> num3 >> dot >> num4) {
-                // Update uniqueElements with the nodes from allNodes
                 uniqueElements.insert(num1);
                 uniqueElements.insert(num2);
                 uniqueElements.insert(num3);
@@ -111,7 +107,6 @@ void Graph::loadData() {
 }
 
 void Graph::printOutDegreesToFile(const std::string& filename) {
-    // Open the output file
     std::ofstream outputFile(filename);
 
     if (!outputFile) {
@@ -125,40 +120,90 @@ void Graph::printOutDegreesToFile(const std::string& filename) {
     }
 
     cout << "Out-degrees written to file: " << filename << "\n";
-    outputFile.close(); // Close the output file
+    outputFile.close();
 }
 
 void Graph::printTop10() {
-    vector<pair<int, int>> outDegreeVector; // Vector of all the out degree values (it is a pair to keep track of the index)
+    vector<pair<int, int>> outDegreeVector;
 
     for (int i = 0; i < numVertices; i++) {
         int outDegree = adjList[i].size();
 
-        outDegreeVector.push_back(make_pair(adjList[i].size(), i)); // Pushes all the number of out degrees in the vector
+        outDegreeVector.push_back(make_pair(adjList[i].size(), i));
     }
 
-    // Sort the outDegreeVector by out-degrees in descending order
-    std::sort(outDegreeVector.begin(), outDegreeVector.end(), std::greater<>()); // Sorts by amount in
+    std::sort(outDegreeVector.begin(), outDegreeVector.end(), std::greater<>());
 
-    // Displaying the highest 10 values
     for (int i = 9; i >= 0; i--) {
         cout << "Number " << i + 1 << " has: " << outDegreeVector[i].first << " outgoing nodes. This is node: " << outDegreeVector[i].second << endl;
     }
 }
 
+vector<string> Graph::BootMaster(const std::string& outputFilename) {
+    vector<string> linesWithBootMaster;
+
+    for (int i = 0; i < numVertices; i++) {
+        int outDegree = adjList[i].size();
+
+        if (outDegree > currentHighest) {
+            currentHighest = outDegree;
+            newHighest = i;
+        }
+    }
+
+    ifstream inputFile("bitacora.txt");
+    if (!inputFile) {
+        cerr << "Error opening the file " << endl;
+    }
+
+    ofstream outputFile(outputFilename);
+    if (!outputFile) {
+        cerr << "Error opening the output file " << outputFilename << endl;
+    }
+
+    string entry;
+    while (std::getline(inputFile, entry)) {
+        stringstream SS(entry);
+        string sa, ch, sb, sc;
+        SS >> sa >> ch >> sb >> sc;
+
+        size_t colonPos = sc.find(':');
+
+        if (colonPos != std::string::npos) {
+            string newString = sc.substr(0, colonPos);
+
+            stringstream splitSS(newString);
+            char dot;
+
+            int num1, num2, num3, num4;
+            if (splitSS >> num1 >> dot >> num2 >> dot >> num3 >> dot >> num4) {
+                if (num1 == newHighest || num2 == newHighest || num3 == newHighest || num4 == newHighest) {
+                    linesWithBootMaster.push_back(entry);
+                    outputFile << entry << "\n";
+                }
+            } else {
+                std::cout << "Invalid IP format" << std::endl;
+            }
+        } else {
+            std::cout << "Colon not found in: " << sc << std::endl;
+        }
+    }
+
+    return linesWithBootMaster;
+}
+
 int main() {
-    Graph g(1000); // Create a Graph instance with an initial number of vertices (0)
+    Graph g(1000);
 
-    // Load the data from the file
     g.loadData();
-
-    // Print out-degrees to a file named "outdegrees.txt"
     g.printOutDegreesToFile("outdegrees.txt");
-
-    // Print the top 10 outdegree values
     g.printTop10();
 
-    // Boot master is probably located on IP address segment 60
+    vector<string> bootMasterLines = g.BootMaster("bootmaster_lines.txt");
+    cout << "\nLines with BootMaster (Node " << g.newHighest << ") written to bootmaster_lines.txt:\n";
+    for (const string& line : bootMasterLines) {
+        cout << line << endl;
+    }
 
     return 0;
 }
