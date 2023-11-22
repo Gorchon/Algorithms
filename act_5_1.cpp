@@ -5,44 +5,42 @@
 #include <algorithm>
 #include <list>
 
-
 using namespace std;
 
-class HashTable{
+class HashTable {
 private:
-    int capacity; // caoacity is the number of buckets in the hash table, the buckets are used to store the values of the hash table 
+    int capacity;
     list<int>* table;
+    int totalCollisions; // New variable to keep track of total collisions
 
 public:
-
-    HashTable(int v){
-        int size = getPrime(v); // Get the prime number
-        this -> capacity = size;  // Set capacity to size 
-        table = new list<int>[capacity]; // Create a table of size capacity and initialize all slots with 0 
+    HashTable(int v) {
+        int size = getPrime(v);
+        this->capacity = size;
+        table = new list<int>[capacity];
+        totalCollisions = 0; // Initialize totalCollisions to 0
     }
 
-    ~HashTable(){ // the destructor is called when the object is destroyed, and can't be called explicitly like the constructor . The object is destroyed when the program ends
-        delete[] table; // Deallocate the array itself
+    ~HashTable() {
+        delete[] table;
         cout << "\nDestructor called" << endl;
     }
 
     bool checkPrime(int n);
     int getPrime(int n);
-
-    void insertItem(int); // Implement item insertion
-    void deleteItem(int); // Implement item deletion
-    int hashFunction(int); // Implement hash function
-    void displayHash(); // Implement hash table display
-
-}; 
+    void insertItem(int);
+    void deleteItem(int);
+    int hashFunction(int);
+    void displayHash();
+};
 
 bool HashTable::checkPrime(int n) {
-    if( n == 0 || n == 1) {
+    if (n == 0 || n == 1) {
         return false;
     }
     int sqr_root = sqrt(n);
-    for(int i = 2; i <= sqr_root; i++) {
-        if(n % i == 0) {
+    for (int i = 2; i <= sqr_root; i++) {
+        if (n % i == 0) {
             return false;
         }
     }
@@ -50,53 +48,68 @@ bool HashTable::checkPrime(int n) {
 }
 
 int HashTable::getPrime(int n) {
-    if(n % 2 == 0) {
+    if (n % 2 == 0) {
         n++;
     }
-    while(!checkPrime(n)) { //checkprime is a function that returns true if the number is prime
+    while (!checkPrime(n)) {
         n += 2;
     }
     return n;
 }
 
 int HashTable::hashFunction(int key) {
-    return (key % capacity);
+    // Implement a better hash function to reduce collisions
+    // to make it more efficient and faster to search and with less collisions I used the division method 
+     //return (key % capacity);
+    //but If I want to make it even better I can use the multiplication method 
+    //return floor(capacity * (key * 0.6180339887 - floor(key * 0.6180339887)));
+    //but if i want to make it even better I can use the universal hashing method 
+    return floor(capacity * (key * 0.6180339887 - floor(key * 0.6180339887))); // 0.6180339887 is the golden ratio 
 }
+
 void HashTable::insertItem(int data) {
     int index = hashFunction(data);
+
+    // Check for collisions
+    if (!table[index].empty()) {
+        cout << "Collision occurred at index " << index << ". ";
+        totalCollisions++;
+    }
+
     table[index].push_back(data);
 }
 
 void HashTable::deleteItem(int key) {
     int index = hashFunction(key);
     list<int>::iterator i;
-    for(i = table[index].begin(); i != table[index].end(); i++) {
-        if(*i == key) { 
+    for (i = table[index].begin(); i != table[index].end(); i++) {
+        if (*i == key) {
             break;
         }
     }
-    if(i != table[index].end()) {
+    if (i != table[index].end()) {
         table[index].erase(i);
     }
 }
 
-void HashTable::displayHash() { 
-    for(int i = 0; i < capacity; i++) {
+void HashTable::displayHash() {
+    for (int i = 0; i < capacity; i++) {
         cout << "table [" << i << "]";
         for (auto x : table[i]) {
             cout << " --> " << x;
         }
         cout << endl;
     }
+    cout << "Total Collisions: " << totalCollisions << endl;
 }
 
 int main() {
-    int data[] = { 231, 321, 212, 321, 433, 262};
-    int size = sizeof(data) / sizeof(data[0]); 
+    int data[] = {231, 321, 212, 321, 433, 262, 321, 521};
+    int size = sizeof(data) / sizeof(data[0]);
 
     HashTable h(size);
 
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         h.insertItem(data[i]);
     }
 
