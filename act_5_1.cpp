@@ -10,14 +10,14 @@ using namespace std;
 
 class HashTable{
 private:
-    int capacity;
+    int capacity; // caoacity is the number of buckets in the hash table, the buckets are used to store the values of the hash table 
     list<int>* table;
 
 public:
 
     HashTable(int v){
         int size = getPrime(v); // Get the prime number
-        this -> capacity = size; 
+        this -> capacity = size;  // Set capacity to size 
         table = new list<int>[capacity]; // Create a table of size capacity and initialize all slots with 0 
     }
 
