@@ -11,14 +11,14 @@ class HashTable {
 private:
     int capacity;
     list<int>* table;
-    int totalCollisions; // New variable to keep track of total collisions
+    int totalCollisions;
 
 public:
     HashTable(int v) {
         int size = getPrime(v);
         this->capacity = size;
         table = new list<int>[capacity];
-        totalCollisions = 0; // Initialize totalCollisions to 0
+        totalCollisions = 0;
     }
 
     ~HashTable() {
@@ -28,9 +28,10 @@ public:
 
     bool checkPrime(int n);
     int getPrime(int n);
-    void insertItem(int);
-    void deleteItem(int);
-    int hashFunction(int);
+    int hashFunction(int key);
+    void insertItem(int data);
+    void insertItemByOpenAddressing(int data);
+    void deleteItem(int key);
     void displayHash();
 };
 
@@ -58,13 +59,26 @@ int HashTable::getPrime(int n) {
 }
 
 int HashTable::hashFunction(int key) {
-    // Implement a better hash function to reduce collisions
-    // to make it more efficient and faster to search and with less collisions I used the division method 
-     //return (key % capacity);
-    //but If I want to make it even better I can use the multiplication method 
-    //return floor(capacity * (key * 0.6180339887 - floor(key * 0.6180339887)));
-    //but if i want to make it even better I can use the universal hashing method 
-    return floor(capacity * (key * 0.6180339887 - floor(key * 0.6180339887))); // 0.6180339887 is the golden ratio 
+    double A = 0.6180339887;
+    double hashValue = floor(capacity * (key * A - floor(key * A)));
+    return static_cast<int>(hashValue) % capacity;
+}
+
+void HashTable::insertItemByOpenAddressing(int data) {
+    int index = hashFunction(data);
+
+    // Check for collisions using quadratic probing
+    int i = 1;
+    while (!table[index].empty()) {
+        if(totalCollisions == 0){
+            totalCollisions++;
+        }  
+        
+        index = (index + i * i) % capacity; 
+        i++;
+    }
+
+    table[index].push_back(data);
 }
 
 void HashTable::insertItem(int data) {
@@ -108,16 +122,20 @@ int main() {
     int size = sizeof(data) / sizeof(data[0]);
 
     HashTable h(size);
+    HashTable h2(size);
 
     for (int i = 0; i < size; i++) {
         h.insertItem(data[i]);
     }
-
+    for (int i = 0; i < size; i++) {
+        h2.insertItemByOpenAddressing(data[i]);
+    }
+    cout << "\nUsing chaining:" << endl;
     h.displayHash();
+    cout << "\nOpen Addressing Quadratic problem resoltion:" << endl;
+    h2.displayHash();
 
     cout << "Delete Element" << endl;
-    h.deleteItem(231);
-    h.displayHash();
 
     return 0;
 }
