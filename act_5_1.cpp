@@ -61,8 +61,17 @@ int HashTable::getPrime(int n) {
 int HashTable::hashFunction(int key) {
     double A = 0.6180339887;
     double hashValue = floor(capacity * (key * A - floor(key * A)));
-    return static_cast<int>(hashValue) % capacity;
+    return static_cast<int>(hashValue) % capacity; 
 }
+//int HashTable::hashFunction(int key) {
+    // Implement a better hash function to reduce collisions
+    // to make it more efficient and faster to search and with less collisions I used the division method 
+     //return (key % capacity);
+    //but If I want to make it even better I can use the multiplication method 
+    //return floor(capacity * (key * 0.6180339887 - floor(key * 0.6180339887)));
+    //but if i want to make it even better I can use the universal hashing method 
+    //return floor(capacity * (key * 0.6180339887 - floor(key * 0.6180339887))); // 0.6180339887 is the golden ratio 
+//}
 
 void HashTable::insertItemByOpenAddressing(int data) {
     int index = hashFunction(data);
@@ -118,7 +127,7 @@ void HashTable::displayHash() {
 }
 
 int main() {
-    int data[] = {231, 321, 212, 321, 433, 262, 321, 521};
+    int data[] = {231, 321, 212, 321, 433, 262, 321, 521, 321};
     int size = sizeof(data) / sizeof(data[0]);
 
     HashTable h(size);
