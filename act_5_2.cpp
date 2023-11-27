@@ -48,6 +48,7 @@ public:
     void displayTopPorts();
     int hashFunction(int key);
     void displayHash();
+    void displayHashToFile(const string& filename);
 };
 
 bool HashTable::checkPrime(int n) {
@@ -145,14 +146,22 @@ void HashTable::displayTopPorts() {
     }
 }
 
-void HashTable::displayHash() {
-    for (int i = 0; i < capacity; i++) {
-        cout << "table [" << i << "]";
-        for (auto &item : table[i]) {
-            cout << " --> " << item.first << " (Total Accesses: " << item.second.first << ")";
-        }
-        cout << endl;
+void HashTable::displayHashToFile(const string& filename) {
+    ofstream outFile(filename);
+    if (!outFile) {
+        cerr << "Error: Unable to open the output file.\n";
+        return;
     }
+
+    for (int i = 0; i < capacity; i++) {
+        outFile << "table [" << i << "]";
+        for (auto &item : table[i]) {
+            outFile << " --> " << item.first << " (Total Accesses: " << item.second.first << ")";
+        }
+        outFile << endl;
+    }
+
+    outFile.close();
 }
 
 int main() {
@@ -162,15 +171,15 @@ int main() {
         return 1;
     }
 
-    HashTable h(10); // You may need to adjust the size based on your data
+    HashTable h(1000); // You may need to adjust the size based on your data
 
     string line;
     while (getline(inFile, line)) {
         h.insertItem(line);
     }
 
-    // Display the entire hash table
-    h.displayHash();
+    // Save the entire hash table to a new file
+    h.displayHashToFile("output.txt");
 
     // Display the top 5 ports with the most accesses
     h.displayTopPorts();
