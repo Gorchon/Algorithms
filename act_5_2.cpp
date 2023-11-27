@@ -9,10 +9,33 @@
 
 using namespace std;
 
+// Function to extract IP address and port from log entry
+pair<string, int> extract_ip_port(string entry) {
+    istringstream iss(entry);
+    string month, day, time, ip, port, action;
+    iss >> month >> day >> time >> ip;
+
+    // The port is the last part of the IP address
+    size_t colonPos = ip.find_last_of(':');
+    port = ip.substr(colonPos + 1);
+    ip = ip.substr(0, colonPos);
+
+    int portNumber;
+    try {
+        portNumber = stoi(port);
+    } catch (const std::invalid_argument &e) {
+        // Handle the case where stoi fails (e.g., non-numeric port)
+        cerr << "Error: Invalid port number in entry: " << entry << endl;
+        return make_pair("", -1);  // Return an invalid pair
+    }
+
+    return make_pair(ip, portNumber);
+}
+
 class HashTable {
 private:
     int capacity;
-    list<pair<int, pair<int, vector<string>>> >* table;
+    list<pair<int, pair<int, vector<string>>>> *table;
 
 public:
     HashTable(int v);
@@ -57,7 +80,7 @@ int HashTable::hashFunction(int key) {
 HashTable::HashTable(int v) {
     int size = getPrime(v);
     this->capacity = size;
-    table = new list<pair<int, pair<int, vector<string>>> >[size];
+    table = new list<pair<int, pair<int, vector<string>>>>[size];
 }
 
 HashTable::~HashTable() {
@@ -65,12 +88,15 @@ HashTable::~HashTable() {
 }
 
 void HashTable::insertItem(string entry) {
-    // Parse the entry and extract the port number
-    istringstream iss(entry);
-    string month, day, time, ip, port, action;
-    iss >> month >> day >> time >> ip >> port >> action;
+    // Extract IP address and port using the modified function
+    auto ip_port = extract_ip_port(entry);
+    if (ip_port.second == -1) {
+        // Invalid port, skip the entry
+        return;
+    }
 
-    int portNumber = stoi(port);
+    string ip = ip_port.first;
+    int portNumber = ip_port.second;
 
     int index = hashFunction(portNumber);
 
@@ -136,7 +162,7 @@ int main() {
         return 1;
     }
 
-    HashTable h(100); // You may need to adjust the size based on your data
+    HashTable h(10); // You may need to adjust the size based on your data
 
     string line;
     while (getline(inFile, line)) {
