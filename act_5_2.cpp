@@ -51,6 +51,16 @@ public:
     void displayHashToFile(const string& filename);
 };
 
+HashTable::HashTable(int v) { 
+    int size = getPrime(v);
+    this->capacity = size;
+    table = new list<pair<int, pair<int, vector<string>>>>[size];
+}
+
+HashTable::~HashTable() {
+    delete[] table;
+}
+
 bool HashTable::checkPrime(int n) {
     if (n == 0 || n == 1) {
         return false;
@@ -74,19 +84,21 @@ int HashTable::getPrime(int n) { //functuibn
     return n;
 }
 
-int HashTable::hashFunction(int key) {
-    return (key % capacity);
+int HashTable::hashFunction(int key) { 
+    double A = 0.6180339887;
+    double hashValue = floor(capacity * (key * A - floor(key * A)));
+    return static_cast<int>(hashValue) % capacity; 
 }
+//int HashTable::hashFunction(int key) {
+    // Implement a better hash function to reduce collisions
+    // to make it more efficient and faster to search and with less collisions I used the division method 
+     //return (key % capacity); //this is the division method is divides the key by the capacity because the capacity is the size of the table 
+    //but If I want to make it even better I can use the multiplication method 
+    //return floor(capacity * (key * 0.6180339887 - floor(key * 0.6180339887)));
+    //but if i want to make it even better I can use the universal hashing method 
+    //return floor(capacity * (key * 0.6180339887 - floor(key * 0.6180339887))); // 0.6180339887 is the golden ratio 
+//}
 
-HashTable::HashTable(int v) {
-    int size = getPrime(v);
-    this->capacity = size;
-    table = new list<pair<int, pair<int, vector<string>>>>[size];
-}
-
-HashTable::~HashTable() {
-    delete[] table;
-}
 
 void HashTable::insertItem(string entry) {
     // Extract IP address and port using the modified function
@@ -106,7 +118,7 @@ void HashTable::insertItem(string entry) {
         if (item.first == portNumber) {
             // Update the existing entry
             item.second.first++; // Increase the total number of accesses
-            item.second.second.push_back(entry); // Add the bitacora entry
+            item.second.second.push_back(entry); // Add the bitacora entry 
             return;
         }
     }
@@ -176,7 +188,7 @@ int main() {
     }
 
     // Create a HashTable object named 'h' with a capacity of 1000
-    HashTable h(1000); // You may need to adjust the size based on your data
+    HashTable h(1000); // we create an object of the class HashTable and we call it h and we give it a capacity of 1000 
 
     // Declare a string variable 'line' to store each line read from the file
     string line;
