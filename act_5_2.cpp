@@ -10,7 +10,7 @@
 using namespace std;
 
 // Function to extract IP address and port from log entry
-pair<string, int> extract_ip_port(string entry) {
+pair<string, int> extract_ip_port(string entry) { //pair is a data structure that allows you to store two values of different types in a single object
     istringstream iss(entry);
     string month, day, time, ip, port, action;
     iss >> month >> day >> time >> ip;
@@ -64,8 +64,8 @@ bool HashTable::checkPrime(int n) {
     return true;
 }
 
-int HashTable::getPrime(int n) {
-    if (n % 2 == 0) {
+int HashTable::getPrime(int n) { //functuibn
+    if (n % 2 == 0) { 
         n++;
     }
     while (!checkPrime(n)) {
@@ -149,7 +149,7 @@ void HashTable::displayTopPorts() {
 void HashTable::displayHashToFile(const string& filename) {
     ofstream outFile(filename);
     if (!outFile) {
-        cerr << "Error: Unable to open the output file.\n";
+        cerr << "Error: Unable to open the output file.\n"; //cerr is for errors and cout is for output 
         return;
     }
 
@@ -165,26 +165,37 @@ void HashTable::displayHashToFile(const string& filename) {
 }
 
 int main() {
-    ifstream inFile("bitacora.txt");
+    // Open the file "bitacora.txt" for reading
+    ifstream inFile("bitacora.txt"); //inFile is the name of the file that we are going to read from 
+
+    // Check if the file opening was successful
     if (!inFile) {
+        // If not successful, print an error message and return 1 (indicating an error)
         cerr << "Error: Unable to open the file.\n";
         return 1;
     }
 
+    // Create a HashTable object named 'h' with a capacity of 1000
     HashTable h(1000); // You may need to adjust the size based on your data
 
+    // Declare a string variable 'line' to store each line read from the file
     string line;
+
+    // Read each line from the file using getline and insert it into the hash table
     while (getline(inFile, line)) {
         h.insertItem(line);
     }
 
-    // Save the entire hash table to a new file
+    // Save the entire hash table to a new file named "output.txt"
     h.displayHashToFile("output.txt");
 
     // Display the top 5 ports with the most accesses
     h.displayTopPorts();
 
+    // Close the file
     inFile.close();
 
+    // Return 0 to indicate successful execution
     return 0;
 }
+
