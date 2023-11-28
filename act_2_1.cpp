@@ -1,3 +1,4 @@
+// implementing a doubly linked list 
 #include <iostream>
 #include <string>
 #include <vector>
@@ -26,8 +27,8 @@ public:
             head = tail = newNode; // we assign the value of newNode to head and tail because it is the first element
         } else { 
             tail->next = newNode;
-            newNode->prev = tail;
-            tail = newNode;
+            newNode->prev = tail; // we assign the value of tail to the prev of newNode because we want to keep the order of the list 
+            tail = newNode; // we assign the value of newNode to tail because it is the last element
         }
     }
 
@@ -50,9 +51,9 @@ public:
             if (current->data == value) {
                 if (current == head) {
                     head = current->next;
-                    if (head)
-                        head->prev = nullptr;
-                } else if (current == tail) {
+                    if (head) // if head is not null then we assign the value of prev to null
+                        head->prev = nullptr; 
+                } else if (current == tail) { // if current is equal to tail then we assign the value of next to null
                     tail = current->prev;
                     if (tail)
                         tail->next = nullptr;
@@ -140,10 +141,65 @@ public:
 };
 
 
+int factoria(int number){
+    if(number == 0){
+        return 1; 
+    }
+      int newNumber =  number * factoria(number - 1);
+      return newNumber;
+      
+}
+
+int sumAll(int number){
+    if(number == 0){
+        return 0; // when is equal to 0 we return 0 and then we go to the next step that is 1 and then we add 1 to 0 and so on
+    }
+      int newNumber =  number + sumAll(number - 1); 
+      return newNumber;
+      
+}
+
+
+//reverse array by recursion 
+void reverseArray(int arr[], int start, int end){
+    if(start >= end){ //this is the base case, this is the case that we want to stop the recursion it happens when start is equal or greater than end
+        return;
+    }
+    int temp = arr[start];
+    arr[start] = arr[end];
+    arr[end] = temp;
+    reverseArray(arr, start + 1, end - 1);
+}
+
+//binary sum by recursion
+int binarySum(int arr[], int start, int end){
+    if(start >= end){
+        return arr[start];
+    }
+    int mid = (start + end) / 2; //we need to find the middle of the array in order to divide the array in two parts
+    return binarySum(arr, start, mid) + binarySum(arr, mid + 1, end); //we call the function again but now we are passing the middle of the array as a parameter
+}
+
 int main() {
+   factoria(5); 
+    cout << sumAll(5) << endl;
+    int arr[] = {1, 2, 3, 4, 5};
+    cout << "Original array: ";
+    for(int i = 0; i < 5; i++){ //this for loops knows that it shold prin arr because we are passing the array as a parameter in the moment of calling the function
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+    reverseArray(arr, 0, 4);
+    cout << "Reversed array: ";
+    for(int i = 0; i < 5; i++){
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+    cout << "Binary sum: " << binarySum(arr, 0, 4) << endl;
     system("cls"); //this is to clear the console
     DoubleLinkedList myList;
     int option, value, newValue;
+    string stringOption;
     while(true){
         cout << "1. Append" << endl;
         cout << "2. Prepend" << endl;
@@ -203,6 +259,8 @@ int main() {
         }
         
     }
+
+    
 
     
 
