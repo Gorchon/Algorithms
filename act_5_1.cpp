@@ -1,3 +1,4 @@
+// the porpuse of this program is to implement a hash table using chaining and open addressing quadratic probing
 #include <iostream>
 #include <vector>
 #include <string>
@@ -48,7 +49,7 @@ bool HashTable::checkPrime(int n) {
     return true;
 }
 
-int HashTable::getPrime(int n) {
+int HashTable::getPrime(int n) { //function to get the prime number 
     if (n % 2 == 0) {
         n++;
     }
@@ -58,7 +59,7 @@ int HashTable::getPrime(int n) {
     return n;
 }
 
-int HashTable::hashFunction(int key) {
+int HashTable::hashFunction(int key) { 
     double A = 0.6180339887;
     double hashValue = floor(capacity * (key * A - floor(key * A)));
     return static_cast<int>(hashValue) % capacity; 
