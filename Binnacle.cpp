@@ -1,3 +1,4 @@
+// Purpose: To sort the binnacle file by the month number including the day number and the hour number
 #include <iostream>
 #include <fstream>
 #include <string>
