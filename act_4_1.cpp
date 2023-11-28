@@ -1,3 +1,4 @@
+// Purpose: This program is used to implement the BFS and DFS algorithms using both adjacency matrix and adjacency list.
 #include <iostream>
 #include <vector>
 #include <list>
