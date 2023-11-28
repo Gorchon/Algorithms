@@ -1,3 +1,4 @@
+//implementation of a priority queue using an array 
 #include <iostream>
 #include <string>
 #include <vector>
@@ -34,7 +35,7 @@ public:
     NumNodes ++;
 
     // Insert the new element with its priority 
-    PQ[NumNodes].priority = priority; 
+    PQ[NumNodes].priority = priority; //la intaxis PQ[NumNodes] is the same as *(PQ + NumNodes) because PQ is a pointer of type Node and NumNodes is the index of the element
     PQ[NumNodes].value = value;
 }
 
@@ -116,7 +117,7 @@ void Update(int value, int newPriority, int newValue) {
 
     // Decrease the number of nodes in the queue
     NumNodes--; // if i do not do this the element will be there but it will not be displayed because the number of nodes is the one that is displayed in the display function
-   N--;
+    N--;
 }
 
 };
@@ -153,3 +154,5 @@ int main() {
 
     return 0;
 }
+
+
